@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: PenAndPaperDmHelper
-  description: PenAndPaperDmHelper
+  description: PenAndPaperDmHelper. Should serve as a template to get to know different technologies and besides have a cool interface as DM.
   version: 1.0.0
 servers:
   - url: 'https://localhost'
@@ -93,6 +93,8 @@ paths:
 
 
     get:
+      tags:
+        - chapters
       parameters:
         - name: name
           in: path
@@ -119,6 +121,8 @@ paths:
 
 
     put:
+      tags:
+        - chapters
       description: Creates a new `chapter` with a name.
       operationId: putChapterByName
       responses:
@@ -129,6 +133,8 @@ paths:
 
 
     delete:
+      tags:
+        - chapters
       description: Deletes the `chapter` by that name
       operationId: deleteChapterByName
       responses:
@@ -139,6 +145,8 @@ paths:
 
 
     patch:
+      tags:
+        - chapters
       description: Updates the `chapter`
       operationId: patchChapterByName
       requestBody:
@@ -177,6 +185,8 @@ paths:
         allowEmptyValue: true
 
     get:
+      tags:
+        - records
       description: Returns a `record`. If no index is given, then all `record`s of this `chapter` are returned.
       operationId: getRecordByChapterAndIndex
       responses:
@@ -194,6 +204,8 @@ paths:
           description: There is no `chapter` by that name.
 
     patch:
+      tags:
+        - records
       description: Updates the `record` by that `index` in that `chapter`.
       parameters:
         - name: index
@@ -211,6 +223,8 @@ paths:
           description: There is no `record` by that `index` or no `chapter` by that `name`.
 
     delete:
+      tags:
+        - records
       description: Deletes the `record` by that `index` in that `chapter`. If no `index` is 
                    given, all `record`s in this `chapter` will be deleted.
       responses:
