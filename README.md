@@ -1,0 +1,2 @@
+# PenAndPaperHelperOpenApi
+OpenAPI specification for PenAndPaperDmHelper
