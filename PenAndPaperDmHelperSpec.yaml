@@ -14,7 +14,11 @@ components:
         name:
           description: Header of this chapter. Has to be unique.
           type: string
-          example: Chapter One - The killing of the dragon
+          example: Chapter 01 - The killing of the dragon
+        subheader:
+          description: Subheader of this chapter.
+          type: string
+          example: Or is it the killing of the group
         records:
           description: An ordered array of records that should be displayed for.
           type: array
@@ -123,14 +127,29 @@ paths:
     put:
       tags:
         - chapters
-      description: Creates a new `chapter` with a name.
+      description: Creates a new `chapter` with a name. If a `chapter` `name` is given in the request body 
+                   and it conflicts with the path parameter, the path parameter is used.
       operationId: putChapterByName
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/chapter'
+            examples:
+              Just a Subheader:
+                value:
+                  subheader: Or is it the killing of the group?
+              A full blown chapter:
+                $ref: '#/components/schemas/chapter'
+              A conflicting request body:
+                value:
+                  name: Other chapter name than given in path parameter
+                  subheader: Nice subheader
       responses:
         200:
           description: A new chapter is created.
         400:
           description: A chapter by that name already exists.
-
 
     delete:
       tags:
@@ -147,16 +166,29 @@ paths:
     patch:
       tags:
         - chapters
-      description: Updates the `chapter`
+      description: Updates the `chapter`. If a attribute is exempted then it will not be updated.
+                   An empty attribute will update the attribute to null / empty / nil.
+                   if another name is set in the request body, the chapter will be renamed.
       operationId: patchChapterByName
       requestBody:
-        description: The new name for the `chapter`.
         required: true
         content:
-          text/plain:
+          application/json:
             schema:
-              type: string
-            example: Chapter 01 - The killing of the group
+              $ref: '#/components/schemas/chapter'
+            examples:
+              Just a Subheader:
+                value:
+                  subheader: Or is it the killing of the group?
+              A full blown chapter:
+                $ref: '#/components/schemas/chapter'
+              A request body with a new chapter name:
+                value:
+                  name: Chapter 01 - The killing of the group
+                  subheader: That's a fast adventure.
+              Records will be deleted:
+                value:
+                  records: []
       responses:
         200:
           description: The name of the chapter is updated.
@@ -202,6 +234,37 @@ paths:
 
         404:
           description: There is no `chapter` by that name.
+    put:
+      tags:
+        - records
+      description: Inserts a new `record` at that `index` in that `chapter`. 
+                   If no `index` is given, then it is appended to the end.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/record'
+            examples:
+              text:
+                value:
+                  "The heroes gather around the dragon. Roll **100** to not be instantly killed."
+              chapter-link:
+                value:
+                  chapter-name: "Chapter 03 - Another chance"
+              picture:
+                value:
+                  base64: iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAMAAADzN3VRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACuUExURf7+/v///0tLSyYmJmFhYQAAAMXFxQMDA9jY2HR0dCUlJRoaGs/Pz+vr62ZmZhMTE0lJSf39/cvLy4ODgxUVFWpqalZWVufn5w0NDRcXF/X19fr6+nZ2dkpKSiMjIzAwMKWlpVJSUgEBARQUFPf39wgICO3t7ZSUlIeHh8DAwHFxcdLS0h0dHR8fH319feXl5fj4+AQEBAICAqKioujo6EFBQeDg4MrKyrGxsfz8/PfHJHQAAAAJcEhZcwAAAxMAAAMTAT1mg8cAAADsSURBVChTlZBZQ8JADIQnwiCCoALigVziBQrK4fX//5g5ui194MGv7SSTbTfp4jCil99KpEny1UhK4hxVqszSMl6teVrmuO7hxDVhfRtE85St+LLUpn3Gc0gT3J/OIS463R5x6a7rGqSp+iZXuHbjpBWPxI0bQ7Si+7Ys3g7kblhMMLJEhxxPIFPcz4oJHiIoj3ginjNjvJjMFyqvwBvaZv2MZajPcsyV/orI+4eVYhFYZ51MNlEKRGe1umCbH0TOjvzskfzKfKIDEt9rlQLrJugPfn4hG6E7l7TnzM5BRlNvt9fGknitkP8D/AFltgj68usxWAAAAABJRU5ErkJggg==
+                  file-format: png
+                  is-shareable-with-group: true
+              environment-lightning:
+                value:
+                  rgb: [0, 0, 255]
+                  brightness: 0.8
+      responses:
+        200:
+          description: Specified `record` is updated.
+        404:
+          description: There is no `record` by that `index` or no `chapter` by that `name`.
 
     patch:
       tags:
@@ -215,7 +278,29 @@ paths:
             type: integer
             minimum: 0
           required: true
-          example: 0
+          example: 8
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/record'
+            examples:
+              text:
+                value:
+                  "Roll **50** to not get discovered."
+              picture:
+                value:
+                  base64: iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAMAAADzN3VRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACuUExURf7+/v///0tLSyYmJmFhYQAAAMXFxQMDA9jY2HR0dCUlJRoaGs/Pz+vr62ZmZhMTE0lJSf39/cvLy4ODgxUVFWpqalZWVufn5w0NDRcXF/X19fr6+nZ2dkpKSiMjIzAwMKWlpVJSUgEBARQUFPf39wgICO3t7ZSUlIeHh8DAwHFxcdLS0h0dHR8fH319feXl5fj4+AQEBAICAqKioujo6EFBQeDg4MrKyrGxsfz8/PfHJHQAAAAJcEhZcwAAAxMAAAMTAT1mg8cAAADsSURBVChTlZBZQ8JADIQnwiCCoALigVziBQrK4fX//5g5ui194MGv7SSTbTfp4jCil99KpEny1UhK4hxVqszSMl6teVrmuO7hxDVhfRtE85St+LLUpn3Gc0gT3J/OIS463R5x6a7rGqSp+iZXuHbjpBWPxI0bQ7Si+7Ys3g7kblhMMLJEhxxPIFPcz4oJHiIoj3ginjNjvJjMFyqvwBvaZv2MZajPcsyV/orI+4eVYhFYZ51MNlEKRGe1umCbH0TOjvzskfzKfKIDEt9rlQLrJugPfn4hG6E7l7TnzM5BRlNvt9fGknitkP8D/AFltgj68usxWAAAAABJRU5ErkJggg==
+                  file-format: png
+                  is-shareable-with-group: true
+              chapter-link:
+                value:
+                  chapter-name: "Chapter 03 - Another chance"
+              environment-lightning:
+                value:
+                  rgb: [ 0, 0, 255 ]
+                  brightness: 0.8
+
       responses:
         200:
           description: Specified `record` is updated.
