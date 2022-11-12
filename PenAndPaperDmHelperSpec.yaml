@@ -3,25 +3,40 @@ info:
   title: PenAndPaperDmHelper
   description: PenAndPaperDmHelper. Should serve as a template to get to know different technologies and besides have a cool interface as DM.
   version: 1.0.0
+  contact:
+    email: nope@nope.com
 servers:
   - url: 'https://localhost'
+tags:
+  - name: chapters
+    description: All operations concerning chapters.
+  - name: records
+    description: All operations concerning records.
 components:
   schemas:
 
     chapter:
       type: object
+      description: A chapter contains records.
       properties:
         name:
           description: Header of this chapter. Has to be unique.
           type: string
           example: Chapter 01 - The killing of the dragon
+          nullable: true
         subheader:
           description: Subheader of this chapter.
           type: string
+          nullable: true
           example: Or is it the killing of the group
         records:
+          example:
+            - The heroes gather around the dragon.
+            - Roll **50** to not die.
+            - Roll **100** to win.
           description: An ordered array of records that should be displayed for.
           type: array
+          nullable: true
           items:
             $ref: '#/components/schemas/record'
 
@@ -99,19 +114,10 @@ paths:
     get:
       tags:
         - chapters
-      parameters:
-        - name: name
-          in: path
-          schema:
-            type: string
-          description: Name of the chapter. If empty, then all chapters are returned.
-          required: false
-          allowEmptyValue: true
-          example: Chapter 01 - The killing of the dragon
       description: Returns a chapter object.
-      operationId: getChapterByName
+      operationId: chapters_getByName
       responses:
-        200:
+        "200":
           description: A chapter object could be found. If parameter `name` is not given and there are no `chapter`s,
             an empty array will be returned.
           content:
@@ -120,56 +126,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/chapter'
-        404:
+        "404":
           description: If parameter `name` is given and a chapter by that name could not be found.
-
-
-    put:
-      tags:
-        - chapters
-      description: Creates a new `chapter` with a name. If a `chapter` `name` is given in the request body 
-                   and it conflicts with the path parameter, the path parameter is used.
-      operationId: putChapterByName
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/chapter'
-            examples:
-              Just a Subheader:
-                value:
-                  subheader: Or is it the killing of the group?
-              A full blown chapter:
-                $ref: '#/components/schemas/chapter'
-              A conflicting request body:
-                value:
-                  name: Other chapter name than given in path parameter
-                  subheader: Nice subheader
-      responses:
-        200:
-          description: A new chapter is created.
-        400:
-          description: A chapter by that name already exists.
-
-    delete:
-      tags:
-        - chapters
-      description: Deletes the `chapter` by that name
-      operationId: deleteChapterByName
-      responses:
-        200:
-          description: The `chapter` is deleted.
-        404:
-          description: A `chapter` with that name does not exist.
-
 
     patch:
       tags:
         - chapters
-      description: Updates the `chapter`. If a attribute is exempted then it will not be updated.
-                   An empty attribute will update the attribute to null / empty / nil.
-                   if another name is set in the request body, the chapter will be renamed.
-      operationId: patchChapterByName
+      description: Updates the `chapter`. If a attribute has a null value, it is not updated
+      operationId: chapters_patchByName
       requestBody:
         required: true
         content:
@@ -177,24 +141,91 @@ paths:
             schema:
               $ref: '#/components/schemas/chapter'
             examples:
-              Just a Subheader:
-                value:
-                  subheader: Or is it the killing of the group?
-              A full blown chapter:
+              chapter:
                 $ref: '#/components/schemas/chapter'
-              A request body with a new chapter name:
+              Just update the subheader:
                 value:
-                  name: Chapter 01 - The killing of the group
-                  subheader: That's a fast adventure.
-              Records will be deleted:
+                  name: Chapter 01 - The killing of the dragon
+                  subheader: Introduction Chapter
+                  records: null
+              Delete all records for the chapter:
                 value:
-                  records: []
+                  name: null
+                  subheader: null
+                  records: [ ]
       responses:
-        200:
+        "200":
           description: The name of the chapter is updated.
-        400:
+        "400":
           description: A chapter with the new name already exists.
-        404:
+        "404":
+          description: A chapter with that name does not exist.
+
+    delete:
+      tags:
+        - chapters
+      description: Deletes the `chapter` by that name
+      operationId: chapters_deleteByName
+      responses:
+        "200":
+          description: The `chapter` is deleted.
+        "404":
+          description: A `chapter` with that name does not exist.
+
+  /chapter:
+
+    put:
+      tags:
+        - chapters
+      description: Creates a new `chapter` with a name. If a `chapter` `name` is given in the request body
+        and it conflicts with the path parameter, the path parameter is used.
+      operationId: chapters_put
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/chapter'
+            examples:
+              chapter:
+                $ref: '#/components/schemas/chapter'
+              No Subheader or records:
+                value:
+                  name: Other chapter name than given in path parameter
+                  subheader: null
+                  records: null
+      responses:
+        "200":
+          description: A new chapter is created.
+        "400":
+          description: A chapter by that name already exists.
+
+    patch:
+      tags:
+        - chapters
+      description: Updates the `chapter`. If a attribute has a null value, it is not updated.
+        Attribute `name` value has to be a valid name
+      operationId: chapters_patch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/chapter'
+            examples:
+              chapter:
+                $ref: '#/components/schemas/chapter'
+              Just update the subheader:
+                value:
+                  name: Chapter 01 - The Killing of the Dragon
+                  subheader: Introduction Chapter
+                  records: null
+      responses:
+        "200":
+          description: The name of the chapter is updated.
+        "400":
+          description: A chapter with the new name already exists.
+        "404":
           description: A chapter with that name does not exist.
 
   /record/{chapter}/{index}:
@@ -212,7 +243,7 @@ paths:
         schema:
           type: integer
           minimum: 0
-        required: false
+        required: true
         example: 0
         allowEmptyValue: true
 
@@ -222,7 +253,7 @@ paths:
       description: Returns a `record`. If no index is given, then all `record`s of this `chapter` are returned.
       operationId: getRecordByChapterAndIndex
       responses:
-        200:
+        "200":
           description: There is a `chapter` by that name. Return value is possibly an empty array,
             if there are no `record`s in this chapter.
           content:
@@ -232,13 +263,14 @@ paths:
                 items:
                   $ref: '#/components/schemas/record'
 
-        404:
+        "404":
           description: There is no `chapter` by that name.
     put:
       tags:
         - records
-      description: Inserts a new `record` at that `index` in that `chapter`. 
-                   If no `index` is given, then it is appended to the end.
+      operationId: records_putByChapterAndIndex
+      description: Inserts a new `record` at that `index` in that `chapter`.
+        If no `index` is given, then it is appended to the end.
       requestBody:
         content:
           application/json:
@@ -258,17 +290,18 @@ paths:
                   is-shareable-with-group: true
               environment-lightning:
                 value:
-                  rgb: [0, 0, 255]
+                  rgb: [ 0, 0, 255 ]
                   brightness: 0.8
       responses:
-        200:
+        "200":
           description: Specified `record` is updated.
-        404:
+        "404":
           description: There is no `record` by that `index` or no `chapter` by that `name`.
 
     patch:
       tags:
         - records
+      operationId: records_patchByChapterAndIndex
       description: Updates the `record` by that `index` in that `chapter`.
       parameters:
         - name: index
@@ -302,18 +335,19 @@ paths:
                   brightness: 0.8
 
       responses:
-        200:
+        "200":
           description: Specified `record` is updated.
-        404:
+        "404":
           description: There is no `record` by that `index` or no `chapter` by that `name`.
 
     delete:
       tags:
         - records
-      description: Deletes the `record` by that `index` in that `chapter`. If no `index` is 
-                   given, all `record`s in this `chapter` will be deleted.
+      operationId: records_deleteByChapterAndIndex
+      description: Deletes the `record` by that `index` in that `chapter`. If no `index` is
+        given, all `record`s in this `chapter` will be deleted.
       responses:
-        200:
+        "200":
           description: Specified `record`(s) are deleted.
           content:
             application/json:
@@ -321,7 +355,7 @@ paths:
                 description: Number of `record`s deleted.
                 example: 120
                 type: integer
-        404:
+        "404":
           description: There is no `record` by that `index` or no `chapter` by that `name`.
 
 
