@@ -8,11 +8,28 @@ info:
 servers:
   - url: 'https://localhost'
 tags:
-  - name: chapters
-    description: All operations concerning chapters.
-  - name: records
-    description: All operations concerning records.
+  - name: Chapter
+    description: All operations concerning a chapter.
+  - name: Record
+    description: All operations concerning a single record.
+  - name: Chapter without name path parameter
+    description: Operations concerning chapters. Chapter is described in Request Body.
+  - name: Multiple records
+    description: Operations concerning multiple records.
+  - name: Graph
+    description: Opertations concerning `graph`s.
 components:
+  parameters:
+    chapter-name:
+      name: chapter-name
+      in: path
+      description: The name of the chapter.
+      schema:
+        type: string
+      required: true
+      example: Chapter 01 - The killing of the dragon
+
+
   schemas:
 
     chapter:
@@ -29,6 +46,11 @@ components:
           type: string
           nullable: true
           example: Or is it the killing of the group
+        approximate-duration-in-minutes:
+          description: How long will the group need for this `chapter`?
+          type: number
+          nullable: true
+          example: 30
         records:
           example:
             - The heroes gather around the dragon.
@@ -95,25 +117,60 @@ components:
       type: object
       description: A link to another chapter.
       properties:
-        chapter-name:
+        chapter-name-from:
+          type: string
+          example: Chapter 01 - The small cute puppy
+        chapter-name-to:
           type: string
           example: Chapter 02 - The big bad wolf
 
-paths:
-  /chapter/{name}:
-    parameters:
-      - name: name
-        in: path
-        description: Name of the chapter.
-        schema:
-          type: string
-        required: true
-        example: Chapter 01 - The killing of the dragon
+    graph:
+      type: object
+      description: A `graph` consists of `chapters` as vertices and `chapter-link`s as edges.
+      properties:
+        chapters:
+          type: array
+          items:
+            type: string
+            description: Name of all `chapter`s.
+        chapter-links:
+          type: array
+          items:
+            $ref: '#/components/schemas/chapter-link'
 
+    path:
+      type: object
+      description: A `path` navigating the `graph` is a sequence of `chapter`s.  
+        For each `chapter` in the sequence with the index *n* 
+        there exists a `chapter-link`, which `chapter-name-from` is the `chapter` *n* 
+        and `chapter-name-to` is the `chapter` with the index *n + 1*.  
+        
+        If there is no `chapter` with the index *n + 1*, `chapter` n is a possible ending of the adventure.  
+        If there exists no `path` for a `chapter` with the index *n* with a arbitrary `chapter` with the index *n-1*,
+        `chapter` n is a possible starting point.
+        If there is more than one `chapter` in the adventure and there exists a `chapter` which is a ending 
+        and a starting point, the `graph` is not valid.
+        If a `path` holds the same `chapter` more than once, it is called a circle.
+        If there is at least one circle, the `graph` is invalid.
+      properties:
+        chapters:
+          description: Sequence of `chapter`s.
+          type: array
+          items:
+            type: string
+        approximate-duration:
+          description: Sum of approximate durations of each `chapter` in the path.
+          type: number
+
+
+paths:
+  /chapter/{chapter-name}:
+    parameters:
+      - $ref: '#/components/parameters/chapter-name'
 
     get:
       tags:
-        - chapters
+        - Chapter
       description: Returns a chapter object.
       operationId: chapters_getByName
       responses:
@@ -131,7 +188,7 @@ paths:
 
     patch:
       tags:
-        - chapters
+        - Chapter
       description: Updates the `chapter`. If a attribute has a null value, it is not updated
       operationId: chapters_patchByName
       requestBody:
@@ -141,7 +198,7 @@ paths:
             schema:
               $ref: '#/components/schemas/chapter'
             examples:
-              chapter:
+              A full blown chapter:
                 $ref: '#/components/schemas/chapter'
               Just update the subheader:
                 value:
@@ -163,7 +220,7 @@ paths:
 
     delete:
       tags:
-        - chapters
+        - Chapter
       description: Deletes the `chapter` by that name
       operationId: chapters_deleteByName
       responses:
@@ -176,7 +233,8 @@ paths:
 
     put:
       tags:
-        - chapters
+        - Chapter
+        - Chapter without name path parameter
       description: Creates a new `chapter` with a name. If a `chapter` `name` is given in the request body
         and it conflicts with the path parameter, the path parameter is used.
       operationId: chapters_put
@@ -187,7 +245,7 @@ paths:
             schema:
               $ref: '#/components/schemas/chapter'
             examples:
-              chapter:
+              A full blown chapter:
                 $ref: '#/components/schemas/chapter'
               No Subheader or records:
                 value:
@@ -202,9 +260,11 @@ paths:
 
     patch:
       tags:
-        - chapters
+        - Chapter
+        - Chapter without name path parameter
       description: Updates the `chapter`. If a attribute has a null value, it is not updated.
-        Attribute `name` value has to be a valid name
+        Attribute `name` value has to be a name of a existing `chapter`. 
+        If a `chapter` has to be renamed, the patch operation with name parameter should be used.
       operationId: chapters_patch
       requestBody:
         required: true
@@ -213,30 +273,67 @@ paths:
             schema:
               $ref: '#/components/schemas/chapter'
             examples:
-              chapter:
+              A full blown chapter:
                 $ref: '#/components/schemas/chapter'
               Just update the subheader:
                 value:
-                  name: Chapter 01 - The Killing of the Dragon
+                  name: Chapter 01 - The killing of the dragon
                   subheader: Introduction Chapter
                   records: null
+              Delete all records:
+                value:
+                  name: Chapter 01 - The killing of the dragon
+                  subheader: null
+                  records: [ ]
       responses:
         "200":
-          description: The name of the chapter is updated.
-        "400":
-          description: A chapter with the new name already exists.
+          description: The `chapter` is updated.
         "404":
-          description: A chapter with that name does not exist.
+          description: A `chapter` with that name does not exist.
 
-  /record/{chapter}/{index}:
+  /record/{chapter-name}:
     parameters:
-      - name: chapter
-        in: path
-        description: The name of the chapter in which the record is.
-        schema:
-          type: string
-        required: true
-        example: Chapter 01 - The killing of the dragon
+      - $ref: '#/components/parameters/chapter-name'
+
+    get:
+      tags:
+        - Record
+        - Multiple records
+      responses:
+        "200":
+          description: There is a `chapter` by that name. All `record`s associated with that `chapter` are returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/record'
+        "400":
+          description: There is no `chapter` by that name.
+
+    delete:
+      tags:
+        - Record
+        - Multiple records
+      responses:
+        "200":
+          description: All `record`s described in the request body are deleted. 
+            If no `record` is given, all `record`s of the `chapter` are deleted.
+        "400":
+          description: There is no `chapter` by that name.
+      requestBody:
+        description: The `record`s to be deleted.
+        required: false
+        content:
+           application/json:
+             schema:
+               type: array
+               items:
+                $ref: '#/components/schemas/record'
+
+  /record/{chapter-name}/{index}:
+    parameters:
+      - $ref: '#/components/parameters/chapter-name'
       - name: index
         in: path
         description: Index of the record in the chapter.
@@ -249,7 +346,7 @@ paths:
 
     get:
       tags:
-        - records
+        - Record
       description: Returns a `record`. If no index is given, then all `record`s of this `chapter` are returned.
       operationId: getRecordByChapterAndIndex
       responses:
@@ -267,7 +364,7 @@ paths:
           description: There is no `chapter` by that name.
     put:
       tags:
-        - records
+        - Record
       operationId: records_putByChapterAndIndex
       description: Inserts a new `record` at that `index` in that `chapter`.
         If no `index` is given, then it is appended to the end.
@@ -300,7 +397,7 @@ paths:
 
     patch:
       tags:
-        - records
+        - Record
       operationId: records_patchByChapterAndIndex
       description: Updates the `record` by that `index` in that `chapter`.
       parameters:
@@ -342,7 +439,7 @@ paths:
 
     delete:
       tags:
-        - records
+        - Record
       operationId: records_deleteByChapterAndIndex
       description: Deletes the `record` by that `index` in that `chapter`. If no `index` is
         given, all `record`s in this `chapter` will be deleted.
@@ -357,6 +454,58 @@ paths:
                 type: integer
         "404":
           description: There is no `record` by that `index` or no `chapter` by that `name`.
+
+  /graph:
+    get:
+      tags:
+        - Graph
+      description: Get the `graph` describing the whole adventure.
+      responses:
+        "200":
+          description: A valid `graph` could be constructed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/graph'
+              examples:
+                An adventure with only one chapter:
+                  value:
+                    chapters:
+                      - Short adventure
+                An adventure with multiple chapters:
+                  value:
+                    chapters:
+                      - Chapter 01 - The cute little puppy
+                      - Chapter 02 - The big bad wolf
+                    chapter-links:
+                      - chapter-name-from: Chapter 01 - The cute little puppy
+                        chapter-name-to: Chapter 02 - The big bad wolf
+                An adventure with multiple starting points:
+                  value:
+                    chapters:
+                      - The cute little puppy
+                      - The big bad wolf
+                      - The shelter
+                    chapter-links:
+                      - chapter-name-from: The cute little puppy
+                        chapter-name-to: The shelter
+                      - chapter-name-from: The big bad wolf
+                        chapter-name-to: The shelter
+
+                An adventure with multiple ending points:
+                  value:
+                    chapters:
+                      - The big bad hound
+                      - The shelter
+                      - First day at dog school
+                    chapter-links:
+                      - chapter-name-from: The big bad hound
+                        chapter-name-to: The shelter
+                      - chapter-name-from: The big bad hound
+                        chapter-name-to: First day at dog school
+
+
+
 
 
 
