@@ -20,8 +20,8 @@ tags:
     description: Opertations concerning `graph`s.
 components:
   parameters:
-    chapter-name:
-      name: chapter-name
+    chapterName:
+      name: chapterName
       in: path
       description: The name of the chapter.
       schema:
@@ -46,7 +46,7 @@ components:
           type: string
           nullable: true
           example: Or is it the killing of the group
-        approximate-duration-in-minutes:
+        approximateDurationInMinutes:
           description: How long will the group need for this `chapter`?
           type: number
           nullable: true
@@ -66,8 +66,9 @@ components:
       anyOf:
         - $ref: '#/components/schemas/text'
         - $ref: '#/components/schemas/picture'
-        - $ref: '#/components/schemas/environment-lightning'
-        - $ref: '#/components/schemas/chapter-link'
+        - $ref: '#/components/schemas/environmentLightning'
+        - $ref: '#/components/schemas/chapterLink'
+        - $ref: '#/components/schemas/backgroundMusic'
 
     text:
       type: string
@@ -83,16 +84,16 @@ components:
           type: string
           format: base64
           example: iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAMAAADzN3VRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACuUExURf7+/v///0tLSyYmJmFhYQAAAMXFxQMDA9jY2HR0dCUlJRoaGs/Pz+vr62ZmZhMTE0lJSf39/cvLy4ODgxUVFWpqalZWVufn5w0NDRcXF/X19fr6+nZ2dkpKSiMjIzAwMKWlpVJSUgEBARQUFPf39wgICO3t7ZSUlIeHh8DAwHFxcdLS0h0dHR8fH319feXl5fj4+AQEBAICAqKioujo6EFBQeDg4MrKyrGxsfz8/PfHJHQAAAAJcEhZcwAAAxMAAAMTAT1mg8cAAADsSURBVChTlZBZQ8JADIQnwiCCoALigVziBQrK4fX//5g5ui194MGv7SSTbTfp4jCil99KpEny1UhK4hxVqszSMl6teVrmuO7hxDVhfRtE85St+LLUpn3Gc0gT3J/OIS463R5x6a7rGqSp+iZXuHbjpBWPxI0bQ7Si+7Ys3g7kblhMMLJEhxxPIFPcz4oJHiIoj3ginjNjvJjMFyqvwBvaZv2MZajPcsyV/orI+4eVYhFYZ51MNlEKRGe1umCbH0TOjvzskfzKfKIDEt9rlQLrJugPfn4hG6E7l7TnzM5BRlNvt9fGknitkP8D/AFltgj68usxWAAAAABJRU5ErkJggg==
-        file-format:
+        fileFormat:
           type: string
           example: png
-        is-shareable-with-group:
+        isShareableWithGroup:
           type: boolean
           example: true
           description: Describes if this picture is just for the DM or meant to be shown to the group.
 
 
-    environment-lightning:
+    environmentLightning:
       type: object
       description: A record content in form of a description of environment lightning.
       properties:
@@ -113,60 +114,106 @@ components:
           maximum: 1
           example: 0.5
 
-    chapter-link:
+    chapterLink:
       type: object
       description: A link to another chapter.
       properties:
-        chapter-name-from:
+        chapterNameFrom:
           type: string
           example: Chapter 01 - The small cute puppy
-        chapter-name-to:
+        chapterNameTo:
           type: string
           example: Chapter 02 - The big bad wolf
 
+    backgroundMusic:
+      type: object
+      description: Background Music
+      properties:
+        name:
+          type: string
+          example: "Market ambient sound"
+        data:
+          type: string
+          format: binary
+          example: OggS1/OpusHead]OggS
+
+
     graph:
       type: object
-      description: A `graph` consists of `chapters` as vertices and `chapter-link`s as edges.
+      description: A `graph` consists of `chapters` as vertices and `chapterLink`s as edges.
+        It is a directed Graph. The direction of a edge is described in the `chapterLink`.
       properties:
         chapters:
           type: array
           items:
             type: string
             description: Name of all `chapter`s.
-        chapter-links:
+        chapterLinks:
           type: array
           items:
-            $ref: '#/components/schemas/chapter-link'
+            $ref: '#/components/schemas/chapterLink'
 
     path:
       type: object
-      description: A `path` navigating the `graph` is a sequence of `chapter`s.  
-        For each `chapter` in the sequence with the index *n* 
-        there exists a `chapter-link`, which `chapter-name-from` is the `chapter` *n* 
-        and `chapter-name-to` is the `chapter` with the index *n + 1*.  
+      description: A `path` navigating the `graph` is a sequence of `chapter`s.
+        For each `chapter` in the sequence with the index *n*
+        there exists a `chapterLink`, which `chapterNameFrom` is the `chapter` *n*
+        and `chapterNameTo` is the `chapter` with the index *n + 1*.
         
-        If there is no `chapter` with the index *n + 1*, `chapter` n is a possible ending of the adventure.  
+        If there is no `chapter` with the index *n + 1*, `chapter` n is a possible ending of the adventure.
         If there exists no `path` for a `chapter` with the index *n* with a arbitrary `chapter` with the index *n-1*,
         `chapter` n is a possible starting point.
-        If there is more than one `chapter` in the adventure and there exists a `chapter` which is a ending 
+        If there is more than one `chapter` in the adventure and there exists a `chapter` which is a ending
         and a starting point, the `graph` is not valid.
         If a `path` holds the same `chapter` more than once, it is called a circle.
         If there is at least one circle, the `graph` is invalid.
+        The minimum size of a `path` is 1.
+        The maximum size of a `path` is the number of `chapter`s.
       properties:
         chapters:
           description: Sequence of `chapter`s.
           type: array
           items:
             type: string
-        approximate-duration:
+          example:
+            - The cute little puppy
+            - The big bad hound
+            - First day at Dog School
+        approximateDurationInMinutes:
           description: Sum of approximate durations of each `chapter` in the path.
           type: number
+          example: 90
 
+  examples:
+    justOnePossiblePath:
+      description: There is just one path with the desired properties.
+      value:
+        - chapters:
+            - The cute little puppy
+            - The big bad hound
+            - First day at Dog School
+          approximateDurationInMinutes: 90
+    multiplePossiblePathsWithSameDuration:
+      description: There are multiple paths with the desired properties.
+      value:
+        - chapters:
+            - The cute little puppy
+            - The big bad hound
+            - First day at Dog School
+          approximateDurationInMinutes: 90
+        - chapters:
+            - The cute little puppy
+            - The big bad hound
+            - The shelter
+          approximateDurationInMinutes: 90
+  responses:
+    graphCouldNotBeConstructed:
+      description: A valid `graph` could not be constructed
 
 paths:
-  /chapter/{chapter-name}:
+  /chapter/{chapterName}:
     parameters:
-      - $ref: '#/components/parameters/chapter-name'
+      - $ref: '#/components/parameters/chapterName'
 
     get:
       tags:
@@ -263,7 +310,7 @@ paths:
         - Chapter
         - Chapter without name path parameter
       description: Updates the `chapter`. If a attribute has a null value, it is not updated.
-        Attribute `name` value has to be a name of a existing `chapter`. 
+        Attribute `name` value has to be a name of a existing `chapter`.
         If a `chapter` has to be renamed, the patch operation with name parameter should be used.
       operationId: chapters_patch
       requestBody:
@@ -291,9 +338,9 @@ paths:
         "404":
           description: A `chapter` with that name does not exist.
 
-  /record/{chapter-name}:
+  /record/{chapterName}:
     parameters:
-      - $ref: '#/components/parameters/chapter-name'
+      - $ref: '#/components/parameters/chapterName'
 
     get:
       tags:
@@ -317,7 +364,7 @@ paths:
         - Multiple records
       responses:
         "200":
-          description: All `record`s described in the request body are deleted. 
+          description: All `record`s described in the request body are deleted.
             If no `record` is given, all `record`s of the `chapter` are deleted.
         "400":
           description: There is no `chapter` by that name.
@@ -325,15 +372,15 @@ paths:
         description: The `record`s to be deleted.
         required: false
         content:
-           application/json:
-             schema:
-               type: array
-               items:
+          application/json:
+            schema:
+              type: array
+              items:
                 $ref: '#/components/schemas/record'
 
-  /record/{chapter-name}/{index}:
+  /record/{chapterName}/{index}:
     parameters:
-      - $ref: '#/components/parameters/chapter-name'
+      - $ref: '#/components/parameters/chapterName'
       - name: index
         in: path
         description: Index of the record in the chapter.
@@ -377,15 +424,15 @@ paths:
               text:
                 value:
                   "The heroes gather around the dragon. Roll **100** to not be instantly killed."
-              chapter-link:
+              chapterLink:
                 value:
-                  chapter-name: "Chapter 03 - Another chance"
+                  chapterName: "Chapter 03 - Another chance"
               picture:
                 value:
                   base64: iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAMAAADzN3VRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACuUExURf7+/v///0tLSyYmJmFhYQAAAMXFxQMDA9jY2HR0dCUlJRoaGs/Pz+vr62ZmZhMTE0lJSf39/cvLy4ODgxUVFWpqalZWVufn5w0NDRcXF/X19fr6+nZ2dkpKSiMjIzAwMKWlpVJSUgEBARQUFPf39wgICO3t7ZSUlIeHh8DAwHFxcdLS0h0dHR8fH319feXl5fj4+AQEBAICAqKioujo6EFBQeDg4MrKyrGxsfz8/PfHJHQAAAAJcEhZcwAAAxMAAAMTAT1mg8cAAADsSURBVChTlZBZQ8JADIQnwiCCoALigVziBQrK4fX//5g5ui194MGv7SSTbTfp4jCil99KpEny1UhK4hxVqszSMl6teVrmuO7hxDVhfRtE85St+LLUpn3Gc0gT3J/OIS463R5x6a7rGqSp+iZXuHbjpBWPxI0bQ7Si+7Ys3g7kblhMMLJEhxxPIFPcz4oJHiIoj3ginjNjvJjMFyqvwBvaZv2MZajPcsyV/orI+4eVYhFYZ51MNlEKRGe1umCbH0TOjvzskfzKfKIDEt9rlQLrJugPfn4hG6E7l7TnzM5BRlNvt9fGknitkP8D/AFltgj68usxWAAAAABJRU5ErkJggg==
-                  file-format: png
-                  is-shareable-with-group: true
-              environment-lightning:
+                  fileFormat: png
+                  isShareableWithGroup: true
+              environmentLightning:
                 value:
                   rgb: [ 0, 0, 255 ]
                   brightness: 0.8
@@ -421,12 +468,12 @@ paths:
               picture:
                 value:
                   base64: iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAMAAADzN3VRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACuUExURf7+/v///0tLSyYmJmFhYQAAAMXFxQMDA9jY2HR0dCUlJRoaGs/Pz+vr62ZmZhMTE0lJSf39/cvLy4ODgxUVFWpqalZWVufn5w0NDRcXF/X19fr6+nZ2dkpKSiMjIzAwMKWlpVJSUgEBARQUFPf39wgICO3t7ZSUlIeHh8DAwHFxcdLS0h0dHR8fH319feXl5fj4+AQEBAICAqKioujo6EFBQeDg4MrKyrGxsfz8/PfHJHQAAAAJcEhZcwAAAxMAAAMTAT1mg8cAAADsSURBVChTlZBZQ8JADIQnwiCCoALigVziBQrK4fX//5g5ui194MGv7SSTbTfp4jCil99KpEny1UhK4hxVqszSMl6teVrmuO7hxDVhfRtE85St+LLUpn3Gc0gT3J/OIS463R5x6a7rGqSp+iZXuHbjpBWPxI0bQ7Si+7Ys3g7kblhMMLJEhxxPIFPcz4oJHiIoj3ginjNjvJjMFyqvwBvaZv2MZajPcsyV/orI+4eVYhFYZ51MNlEKRGe1umCbH0TOjvzskfzKfKIDEt9rlQLrJugPfn4hG6E7l7TnzM5BRlNvt9fGknitkP8D/AFltgj68usxWAAAAABJRU5ErkJggg==
-                  file-format: png
-                  is-shareable-with-group: true
-              chapter-link:
+                  fileFormat: png
+                  isShareableWithGroup: true
+              chapterLink:
                 value:
-                  chapter-name: "Chapter 03 - Another chance"
-              environment-lightning:
+                  chapterName: "Chapter 03 - Another chance"
+              environmentLightning:
                 value:
                   rgb: [ 0, 0, 255 ]
                   brightness: 0.8
@@ -462,7 +509,7 @@ paths:
       description: Get the `graph` describing the whole adventure.
       responses:
         "200":
-          description: A valid `graph` could be constructed.
+          description: A valid `graph` can be constructed. A `graph` is valid when there are no invalid `path`s.
           content:
             application/json:
               schema:
@@ -477,20 +524,20 @@ paths:
                     chapters:
                       - Chapter 01 - The cute little puppy
                       - Chapter 02 - The big bad wolf
-                    chapter-links:
-                      - chapter-name-from: Chapter 01 - The cute little puppy
-                        chapter-name-to: Chapter 02 - The big bad wolf
+                    chapterLinks:
+                      - chapterNameFrom: Chapter 01 - The cute little puppy
+                        chapterNameTo: Chapter 02 - The big bad wolf
                 An adventure with multiple starting points:
                   value:
                     chapters:
                       - The cute little puppy
                       - The big bad wolf
                       - The shelter
-                    chapter-links:
-                      - chapter-name-from: The cute little puppy
-                        chapter-name-to: The shelter
-                      - chapter-name-from: The big bad wolf
-                        chapter-name-to: The shelter
+                    chapterLinks:
+                      - chapterNameFrom: The cute little puppy
+                        chapterNameTo: The shelter
+                      - chapterNameFrom: The big bad wolf
+                        chapterNameTo: The shelter
 
                 An adventure with multiple ending points:
                   value:
@@ -498,13 +545,80 @@ paths:
                       - The big bad hound
                       - The shelter
                       - First day at dog school
-                    chapter-links:
-                      - chapter-name-from: The big bad hound
-                        chapter-name-to: The shelter
-                      - chapter-name-from: The big bad hound
-                        chapter-name-to: First day at dog school
+                    chapterLinks:
+                      - chapterNameFrom: The big bad hound
+                        chapterNameTo: The shelter
+                      - chapterNameFrom: The big bad hound
+                        chapterNameTo: First day at dog school
+        "417":
+          $ref: '#/components/responses/graphCouldNotBeConstructed'
 
+  /paths/shortest:
+    get:
+      tags:
+        - Graph
+      description: Get the shortest possible `path`s in the `graph`.
+      responses:
+        "200":
+          description: A valid `graph` can be constructed. The shortest `path` is returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/path'
+        "417":
+          $ref: '#/components/responses/graphCouldNotBeConstructed'
 
+  /paths/longest:
+    get:
+      tags:
+        - Graph
+      description: Get the longest possible `path`s in the `graph`.
+      responses:
+        "200":
+          description: A valid `graph` can be constructed. The longest `path` is returned.
+          content:
+            application/json:
+              examples:
+                Just one longest path:
+                  $ref: '#/components/examples/justOnePossiblePath'
+                Multiple possible longest paths:
+                  $ref: '#/components/examples/multiplePossiblePathsWithSameDuration'
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/path'
+        "417":
+          $ref: '#/components/responses/graphCouldNotBeConstructed'
+
+  /paths/next/{startingPoint}:
+    get:
+      tags:
+        - Graph
+      description: Get the next possible `path`s starting with the given `chapter`.
+      parameters:
+        - name: startingPoint
+          description: The `chapter`s `name` as ´startingPoint`.
+          required: true
+          in: path
+          example: "Wishing for a friend"
+      responses:
+        "200":
+          description: A valid `graph` can be constructed. The possible `path`s from the `startingPoint` are returned.
+          content:
+            application/json:
+              examples:
+                Just one possible path:
+                  $ref: '#/components/examples/justOnePossiblePath'
+                Multiple possible paths:
+                  $ref: '#/components/examples/multiplePossiblePathsWithSameDuration'
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/path'
+        "417":
+          $ref: '#/components/responses/graphCouldNotBeConstructed'
 
 
 
