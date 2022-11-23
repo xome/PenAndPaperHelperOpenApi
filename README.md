@@ -9,8 +9,7 @@ Generator functions are not used on purpose.
 
 ----
 ## Backend
-[Go](https://github.com/xome/PenAndPaperDmHelperBackendGo)  
-[Spring]()
+[Spring Web with Postgres](https://github.com/xome/PenAndPaperDmHelperBackendSpringPostgres)
 
 ## Frontend
 [Swing]()
