@@ -8,6 +8,8 @@ info:
 servers:
   - url: 'https://localhost'
 tags:
+  - name: Adventure
+    description: Operations concernoing `adventure`s.
   - name: Chapter
     description: All operations concerning a chapter.
   - name: Record
@@ -17,7 +19,7 @@ tags:
   - name: Multiple records
     description: Operations concerning multiple records.
   - name: Graph
-    description: Opertations concerning `graph`s.
+    description: Operations concerning `graph`s.
 components:
   parameters:
     chapterName:
@@ -29,8 +31,32 @@ components:
       required: true
       example: Chapter 01 - The killing of the dragon
 
+    adventureName:
+      name: adventureName
+      in: path
+      description: The name of the adventure.
+      schema:
+        type: string
+      required: true
+      example: A man's best friend
+
+
 
   schemas:
+
+    adventure:
+      type: object
+      description: An adventure holding all `chapters`.
+      properties:
+        name:
+          description: Name of the adventure.
+          type: string
+          example: A man's best friend
+          nullable: false
+        chapters:
+          type: array
+          items:
+            $ref: '#/components/schemas/chapter'
 
     chapter:
       type: object
@@ -211,8 +237,74 @@ components:
       description: A valid `graph` could not be constructed
 
 paths:
-  /chapter/{chapterName}:
+
+  /adventures:
+    get:
+      tags:
+        - Adventure
+      description: Get the names of all available `adventure`s.
+      responses:
+        "200":
+          description: There are adventures available.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example:
+                    - A man's best friend
+                    - Dragon layer 3
+        "404":
+          description: There is no adventure available.
+
+  /adventure/{adventureName}:
     parameters:
+      - $ref: '#/components/parameters/adventureName'
+
+    delete:
+      tags:
+        - Adventure
+      description: Delete an `adventure`.
+      responses:
+        "200":
+          description: Adventure was deleted.
+        "404":
+          description: There was no `adventure` by that name.
+
+    put:
+      tags:
+        - Adventure
+      description: Create a new `adventure`.
+      responses:
+        "200":
+          description: The `adventure` was created.
+        "400":
+          description: There already is an `adventure` by that name.
+
+    patch:
+      tags:
+        - Adventure
+      description: Rename an `adventure`.
+      requestBody:
+        required: true
+        description: The new `name` for the `adventure`.
+        content:
+          application/json:
+            schema:
+              type: string
+            example: A man's best fiend
+
+      responses:
+        "200":
+          description: The `adventure` was renamed.
+        "400":
+          description: There already was an `adventure` by that name.
+
+
+  /chapter/{adventureName}/{chapterName}:
+    parameters:
+      - $ref: '#/components/parameters/adventureName'
       - $ref: '#/components/parameters/chapterName'
 
     get:
@@ -276,7 +368,10 @@ paths:
         "404":
           description: A `chapter` with that name does not exist.
 
-  /chapter:
+  /chapter/{adventureName}:
+
+    parameters:
+      - $ref: '#/components/parameters/adventureName'
 
     put:
       tags:
@@ -338,8 +433,9 @@ paths:
         "404":
           description: A `chapter` with that name does not exist.
 
-  /record/{chapterName}:
+  /record/{adventureName}/{chapterName}:
     parameters:
+      - $ref: '#/components/parameters/adventureName'
       - $ref: '#/components/parameters/chapterName'
 
     get:
@@ -378,8 +474,9 @@ paths:
               items:
                 $ref: '#/components/schemas/record'
 
-  /record/{chapterName}/{index}:
+  /record/{adventureName}/{chapterName}/{index}:
     parameters:
+      - $ref: '#/components/parameters/adventureName'
       - $ref: '#/components/parameters/chapterName'
       - name: index
         in: path
@@ -502,7 +599,10 @@ paths:
         "404":
           description: There is no `record` by that `index` or no `chapter` by that `name`.
 
-  /graph:
+  /graph/{adventureName}:
+    parameters:
+      - $ref: '#/components/parameters/adventureName'
+
     get:
       tags:
         - Graph
@@ -553,7 +653,11 @@ paths:
         "417":
           $ref: '#/components/responses/graphCouldNotBeConstructed'
 
-  /paths/shortest:
+  /paths/shortest/{adventureName}:
+
+    parameters:
+      - $ref: '#/components/parameters/adventureName'
+
     get:
       tags:
         - Graph
@@ -570,7 +674,11 @@ paths:
         "417":
           $ref: '#/components/responses/graphCouldNotBeConstructed'
 
-  /paths/longest:
+  /paths/longest/{adventureName}:
+
+    parameters:
+      - $ref: '#/components/parameters/adventureName'
+
     get:
       tags:
         - Graph
@@ -592,7 +700,11 @@ paths:
         "417":
           $ref: '#/components/responses/graphCouldNotBeConstructed'
 
-  /paths/next/{startingPoint}:
+  /paths/next/{adventureName}/{startingPoint}:
+
+    parameters:
+      - $ref: '#/components/parameters/adventureName'
+
     get:
       tags:
         - Graph
