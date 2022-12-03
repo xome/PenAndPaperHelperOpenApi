@@ -602,6 +602,8 @@ paths:
           description: The `chapter`s `name` as ´startingPoint`.
           required: true
           in: path
+          schema:
+            type: string
           example: "Wishing for a friend"
       responses:
         "200":
