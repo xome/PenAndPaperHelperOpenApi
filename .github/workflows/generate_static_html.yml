@@ -27,9 +27,11 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: OpenAPI Generator Action
-        uses: kpurdon/openapi-generator-action@v0.0.3
+        uses: craicoverflow/openapi-generator-generate-action@v1.2.1
         with:
-          args: "generate -i ./PenAndPaperDmHelperSpec.yaml -g html2 -o ./public"
+          generator: html2
+          input: PenAndPaperDmHelperSpec.yaml
+          # args: "generate -i ./PenAndPaperDmHelperSpec.yaml -g html2 -o ./public"
       
      
       #- name: Git Commit and Push
