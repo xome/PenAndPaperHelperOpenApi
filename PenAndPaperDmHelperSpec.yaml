@@ -54,6 +54,7 @@ components:
           example: A man's best friend
           nullable: false
         chapters:
+          nullable: true
           type: array
           items:
             $ref: '#/components/schemas/chapter'
@@ -66,7 +67,7 @@ components:
           description: Header of this chapter. Has to be unique.
           type: string
           example: Chapter 01 - The killing of the dragon
-          nullable: true
+          nullable: false
         subheader:
           description: Subheader of this chapter.
           type: string
@@ -98,6 +99,7 @@ components:
 
     text:
       type: string
+      nullable: false
       description: A record content in form of a text. Markdown is allowed.
       example: The heroes gather around the dragon. Roll **100** for instant kill.
 
@@ -107,14 +109,17 @@ components:
       description: A record content as image encoded in Base64.
       properties:
         base64:
+          nullable: false
           type: string
           format: base64
           example: iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAMAAADzN3VRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACuUExURf7+/v///0tLSyYmJmFhYQAAAMXFxQMDA9jY2HR0dCUlJRoaGs/Pz+vr62ZmZhMTE0lJSf39/cvLy4ODgxUVFWpqalZWVufn5w0NDRcXF/X19fr6+nZ2dkpKSiMjIzAwMKWlpVJSUgEBARQUFPf39wgICO3t7ZSUlIeHh8DAwHFxcdLS0h0dHR8fH319feXl5fj4+AQEBAICAqKioujo6EFBQeDg4MrKyrGxsfz8/PfHJHQAAAAJcEhZcwAAAxMAAAMTAT1mg8cAAADsSURBVChTlZBZQ8JADIQnwiCCoALigVziBQrK4fX//5g5ui194MGv7SSTbTfp4jCil99KpEny1UhK4hxVqszSMl6teVrmuO7hxDVhfRtE85St+LLUpn3Gc0gT3J/OIS463R5x6a7rGqSp+iZXuHbjpBWPxI0bQ7Si+7Ys3g7kblhMMLJEhxxPIFPcz4oJHiIoj3ginjNjvJjMFyqvwBvaZv2MZajPcsyV/orI+4eVYhFYZ51MNlEKRGe1umCbH0TOjvzskfzKfKIDEt9rlQLrJugPfn4hG6E7l7TnzM5BRlNvt9fGknitkP8D/AFltgj68usxWAAAAABJRU5ErkJggg==
         fileFormat:
           type: string
+          nullable: false
           example: png
         isShareableWithGroup:
           type: boolean
+          nullable: false
           example: true
           description: Describes if this picture is just for the DM or meant to be shown to the group.
 
@@ -126,6 +131,7 @@ components:
         rgb:
           description: An array containing in this order red green blue parts of the colour to be shown.
           type: array
+          nullable: false
           minLength: 3
           maxLength: 3
           items:
@@ -136,6 +142,7 @@ components:
         brightness:
           description: A fractal between 0 and 1 which represents the brightness level of the environment lightning.
           type: number
+          nullable: false
           minimum: 0
           maximum: 1
           example: 0.5
@@ -146,9 +153,11 @@ components:
       properties:
         chapterNameFrom:
           type: string
+          nullable: false
           example: Chapter 01 - The small cute puppy
         chapterNameTo:
           type: string
+          nullable: false
           example: Chapter 02 - The big bad wolf
 
     backgroundMusic:
@@ -157,10 +166,12 @@ components:
       properties:
         name:
           type: string
+          nullable: false
           example: "Market ambient sound"
         data:
           type: string
           format: binary
+          nullable: false
           example: OggS1/OpusHead]OggS
 
 
