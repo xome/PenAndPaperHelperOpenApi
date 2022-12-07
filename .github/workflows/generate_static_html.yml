@@ -29,6 +29,7 @@ jobs:
       - name: OpenAPI Generator Action
         uses: craicoverflow/openapi-generator-generate-action@v1.2.1
         with:
+          version: 3.0
           generator: html2
           input: PenAndPaperDmHelperSpec.yaml
           # args: "generate -i ./PenAndPaperDmHelperSpec.yaml -g html2 -o ./public"
