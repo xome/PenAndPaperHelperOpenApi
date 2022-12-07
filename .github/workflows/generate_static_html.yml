@@ -25,22 +25,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # Runs a single command using the runners shell
       - name: OpenAPI Generator Action
         uses: craicoverflow/openapi-generator-generate-action@v1.2.1
         with:
-          version: 3.0
+          version: 5.0.0
           generator: html2
           input: PenAndPaperDmHelperSpec.yaml
-          # args: "generate -i ./PenAndPaperDmHelperSpec.yaml -g html2 -o ./public"
-      
-     
-      #- name: Git Commit and Push
-      #  uses: github-actions-x/commit@v2.9
-      #  with:
-      #    github-token: ${{ secrets.GITHUB_TOKEN }}
-      #    push-branch: 'main'
-      #    commit-message: 'Generate static HTML2 for OpenApi spec'
-      #    force-add: 'true'
-      #    files: $GITHUB_WORKSPACE/public
- 
+          
