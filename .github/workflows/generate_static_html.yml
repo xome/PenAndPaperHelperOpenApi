@@ -29,15 +29,15 @@ jobs:
       - name: OpenAPI Generator Action
         uses: kpurdon/openapi-generator-action@v0.0.3
         with:
-          args: "generate -i $GITHUB_WORKSPACE/PenAndPaperDmHelperSpec.yaml -g html2 -o $GITHUB_WORKSPACE/public"
+          args: "generate -i ./PenAndPaperDmHelperSpec.yaml -g html2 -o ./public"
       
      
-      - name: Git Commit and Push
-        uses: github-actions-x/commit@v2.9
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          push-branch: 'main'
-          commit-message: 'Generate static HTML2 for OpenApi spec'
-          force-add: 'true'
-          files: $GITHUB_WORKSPACE/public
+      #- name: Git Commit and Push
+      #  uses: github-actions-x/commit@v2.9
+      #  with:
+      #    github-token: ${{ secrets.GITHUB_TOKEN }}
+      #    push-branch: 'main'
+      #    commit-message: 'Generate static HTML2 for OpenApi spec'
+      #    force-add: 'true'
+      #    files: $GITHUB_WORKSPACE/public
  
