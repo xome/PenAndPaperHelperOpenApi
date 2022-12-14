@@ -94,7 +94,7 @@ components:
         - $ref: '#/components/schemas/text'
         - $ref: '#/components/schemas/picture'
         - $ref: '#/components/schemas/environmentLightning'
-        - $ref: '#/components/schemas/chapterLink'
+        - $ref: '#/components/schemas/chapterLinkRecord'
         - $ref: '#/components/schemas/backgroundMusic'
 
     text:
@@ -147,14 +147,10 @@ components:
           maximum: 1
           example: 0.5
 
-    chapterLink:
+    chapterLinkRecord:
       type: object
       description: A link to another chapter.
       properties:
-        chapterNameFrom:
-          type: string
-          nullable: false
-          example: Chapter 01 - The small cute puppy
         chapterNameTo:
           type: string
           nullable: false
@@ -173,7 +169,6 @@ components:
           format: binary
           nullable: false
           example: OggS1/OpusHead]OggS
-
 
     graph:
       type: object
@@ -200,12 +195,10 @@ components:
         If there is no `chapter` with the index *n + 1*, `chapter` n is a possible ending of the adventure.
         If there exists no `path` for a `chapter` with the index *n* with a arbitrary `chapter` with the index *n-1*,
         `chapter` n is a possible starting point.
-        If there is more than one `chapter` in the adventure and there exists a `chapter` which is a ending
-        and a starting point, the `graph` is not valid.
         If a `path` holds the same `chapter` more than once, it is called a circle.
         If there is at least one circle, the `graph` is invalid.
         The minimum size of a `path` is 1.
-        The maximum size of a `path` is the number of `chapter`s.
+        The maximum size of a valid `path` is the number of `chapter`s.
       properties:
         chapters:
           description: Sequence of `chapter`s.
@@ -220,6 +213,20 @@ components:
           description: Sum of approximate durations of each `chapter` in the path.
           type: number
           example: 90
+
+    chapterLink:
+      type: object
+      properties:
+        from:
+          type: string
+          nullable: false
+          example: Chapter 01 - The small cute puppy
+        to:
+          type: string
+          nullable: false
+          example: Chapter 02 - The big bad wolf
+
+
 
   examples:
     justOnePossiblePath:
@@ -243,6 +250,7 @@ components:
             - The big bad hound
             - The shelter
           approximateDurationInMinutes: 90
+
   responses:
     graphCouldNotBeConstructed:
       description: A valid `graph` could not be constructed
