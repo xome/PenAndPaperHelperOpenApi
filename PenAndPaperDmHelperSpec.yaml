@@ -254,6 +254,15 @@ components:
   responses:
     graphCouldNotBeConstructed:
       description: A valid `graph` could not be constructed
+      content:
+        application/json:
+          schema:
+            type: array
+            description: Problematic `path`s
+            items:
+              $ref: '#/components/schemas/path'
+    noAdventureByThatName:
+      description: There is no `adventure` by that name
 
 paths:
 
@@ -671,6 +680,8 @@ paths:
                         chapterNameTo: First day at dog school
         "417":
           $ref: '#/components/responses/graphCouldNotBeConstructed'
+        "404":
+          $ref: '#/components/responses/noAdventureByThatName'
 
   /paths/shortest/{adventureName}:
 
@@ -692,6 +703,8 @@ paths:
                   $ref: '#/components/schemas/path'
         "417":
           $ref: '#/components/responses/graphCouldNotBeConstructed'
+        "404":
+          $ref: '#/components/responses/noAdventureByThatName'
 
   /paths/longest/{adventureName}:
 
@@ -718,6 +731,8 @@ paths:
                   $ref: '#/components/schemas/path'
         "417":
           $ref: '#/components/responses/graphCouldNotBeConstructed'
+        "404":
+          $ref: '#/components/responses/noAdventureByThatName'
 
   /paths/next/{adventureName}/{startingPoint}:
 
@@ -752,6 +767,8 @@ paths:
                   $ref: '#/components/schemas/path'
         "417":
           $ref: '#/components/responses/graphCouldNotBeConstructed'
+        "404":
+          $ref: '#/components/responses/noAdventureByThatName'
 
 
 
