@@ -253,7 +253,8 @@ components:
 
   responses:
     graphCouldNotBeConstructed:
-      description: A valid `graph` could not be constructed
+      description: A valid `graph` could not be constructed. Problematic `path`s are described in the body.
+                   If no `path`s are returned, all `path`s are invalid.
       content:
         application/json:
           schema:
