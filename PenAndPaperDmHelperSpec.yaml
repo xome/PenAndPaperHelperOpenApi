@@ -288,11 +288,9 @@ paths:
                 type: array
                 items:
                   type: string
-                  example:
-                    - A man's best friend
-                    - Dragon layer 3
-        "404":
-          description: There is no adventure available.
+                example:
+                  - A man's best friend
+                  - Dragon layer 3
 
   /adventure/{adventureName}:
     parameters:
