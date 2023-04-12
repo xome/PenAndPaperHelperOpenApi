@@ -485,7 +485,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/record'
-        "400":
+        "404":
           description: There is no `chapter` by that name.
 
     delete:
@@ -496,7 +496,7 @@ paths:
         "200":
           description: All `record`s described in the request body are deleted.
             If no `record` is given, all `record`s of the `chapter` are deleted.
-        "400":
+        "404":
           description: There is no `chapter` by that name.
       requestBody:
         description: The `record`s to be deleted.
@@ -525,21 +525,19 @@ paths:
     get:
       tags:
         - Record
-      description: Returns a `record`. If no index is given, then all `record`s of this `chapter` are returned.
+      description: Returns a `record`.
       operationId: getRecordByChapterAndIndex
       responses:
         "200":
-          description: There is a `chapter` by that name. Return value is possibly an empty array,
+          description: There is a `chapter` by that name and a `record` by that index. 
             if there are no `record`s in this chapter.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/record'
+                $ref: '#/components/schemas/record'
 
         "404":
-          description: There is no `chapter` by that name.
+          description: There is no `record` by that index or no `chapter` by that name.
     put:
       tags:
         - Record
