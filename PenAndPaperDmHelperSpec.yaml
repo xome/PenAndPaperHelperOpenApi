@@ -555,7 +555,7 @@ paths:
                   "The heroes gather around the dragon. Roll **100** to not be instantly killed."
               chapterLink:
                 value:
-                  chapterName: "Chapter 03 - Another chance"
+                  chapterNameTo: "Chapter 03 - Another chance"
               picture:
                 value:
                   base64: iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAMAAADzN3VRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACuUExURf7+/v///0tLSyYmJmFhYQAAAMXFxQMDA9jY2HR0dCUlJRoaGs/Pz+vr62ZmZhMTE0lJSf39/cvLy4ODgxUVFWpqalZWVufn5w0NDRcXF/X19fr6+nZ2dkpKSiMjIzAwMKWlpVJSUgEBARQUFPf39wgICO3t7ZSUlIeHh8DAwHFxcdLS0h0dHR8fH319feXl5fj4+AQEBAICAqKioujo6EFBQeDg4MrKyrGxsfz8/PfHJHQAAAAJcEhZcwAAAxMAAAMTAT1mg8cAAADsSURBVChTlZBZQ8JADIQnwiCCoALigVziBQrK4fX//5g5ui194MGv7SSTbTfp4jCil99KpEny1UhK4hxVqszSMl6teVrmuO7hxDVhfRtE85St+LLUpn3Gc0gT3J/OIS463R5x6a7rGqSp+iZXuHbjpBWPxI0bQ7Si+7Ys3g7kblhMMLJEhxxPIFPcz4oJHiIoj3ginjNjvJjMFyqvwBvaZv2MZajPcsyV/orI+4eVYhFYZ51MNlEKRGe1umCbH0TOjvzskfzKfKIDEt9rlQLrJugPfn4hG6E7l7TnzM5BRlNvt9fGknitkP8D/AFltgj68usxWAAAAABJRU5ErkJggg==
@@ -568,6 +568,8 @@ paths:
       responses:
         "200":
           description: Specified `record` is updated.
+        "400":
+          description: In case of a `chapter link` - there is no `chapter` by the name given in the field `chapterName`.
         "404":
           description: There is no `record` by that `index` or no `chapter` by that `name`.
 
@@ -601,7 +603,7 @@ paths:
                   isShareableWithGroup: true
               chapterLink:
                 value:
-                  chapterName: "Chapter 03 - Another chance"
+                  chapterNameTo: "Chapter 03 - Another chance"
               environmentLightning:
                 value:
                   rgb: [ 0, 0, 255 ]
@@ -610,6 +612,8 @@ paths:
       responses:
         "200":
           description: Specified `record` is updated.
+        "400":
+          description: In case of a `chapter link` - there is no `chapter` by the name given in the field `chapterName`.
         "404":
           description: There is no `record` by that `index` or no `chapter` by that `name`.
 
