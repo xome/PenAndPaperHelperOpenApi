@@ -621,19 +621,13 @@ paths:
       tags:
         - Record
       operationId: records_deleteByChapterAndIndex
-      description: Deletes the `record` by that `index` in that `chapter`. If no `index` is
-        given, all `record`s in this `chapter` will be deleted.
+      description: Deletes the `record` by that `index` in that `chapter`.
       responses:
         "200":
-          description: Specified `record`(s) are deleted.
-          content:
-            application/json:
-              schema:
-                description: Number of `record`s deleted.
-                example: 120
-                type: integer
+          description: Specified `record` is deleted or did not exist.
         "404":
-          description: There is no `record` by that `index` or no `chapter` by that `name`.
+          description: There is no `chapter` by that `name` or no `adventure` by that name. If there is no `record` with
+                       the given `index`, then status 200 is returned.
 
   /graph/{adventureName}:
     parameters:
